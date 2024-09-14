@@ -3,7 +3,7 @@
 
 This program implements the exact evaluation of Catmull-Clark subdivision surfaces, aiming to provide a robust tool for solving basis function to support related work of subdivision-based isogeometric analysis.
 
-![这是图片](https://raw.githubusercontent.com/JinLingzhi/Pictures/main/freecompress-vehicle1.png)
+![这是图片](https://raw.githubusercontent.com/JinLingzhi/Pictures/main/freecompress-vehicle.png)
 
 # 文件结构
 ```
