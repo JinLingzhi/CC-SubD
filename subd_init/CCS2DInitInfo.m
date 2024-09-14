@@ -1,4 +1,4 @@
-function [SubDInfo,subd] = CCS2DInitInfo(subd,level)
+function [SubDInfos,subd] = CCS2DInitInfo(subd,level)
 %% Instruction of programs ================================================
 %
 % Description:
@@ -8,21 +8,19 @@ function [SubDInfo,subd] = CCS2DInitInfo(subd,level)
 % Email : jinlz0428@outlook.com
 %
 % Date Created : 2024/8/31
-% Last Modified: 2024/9/06
+% Last Modified: 2024/9/12
 %
 % =========================================================================
 % Calling Sequence:
-%    [SubDInfo,subd] = CCS2DInitInfo(subd,level)
+%    [SubDInfos,subd] = CCS2DInitInfo(subd,level)
 %
 % Inputs:
-%    subd  : Data structure for representing a subdivision surface
-%    level : Subdivision level
+%    subd      : Data structure for representing a subdivision surface
+%    level     : Subdivision level
 %
 % Outputs:
-%    V : Coordinates of all vertices
-%    F : Vertex indices of all faces
-%
-%    https://www.cnblogs.com/shushen/p/5251070.html
+%    SubDInfos :
+%    subd      : Data structure for representing a subdivision surface
 %
 %% Body of programs =======================================================
 %
@@ -38,19 +36,21 @@ topo = CCS2DClassifyTopo(V,F,E,Eic);
 clas = CCS2DClassifyMesh(V,F,E,Eic);
 
 %% Initialize information for subdivision surface
-SubDInfo = struct('ancestor',[],'children',[], ...
-    'corner',[],'nodes',[],'mmtxs',[],'tree',[],'turn',[]);
+SubDInfos = struct('parent',[],'corner',[],'nodes',[],'mmtxs',[], ...
+    'tree',[],'turn',[],'type',[]);
 
 for index_face = 1:size(F,1)
-    SubDInfo(index_face).ancestor = index_face ...
+    SubDInfos(index_face).ancestor = index_face ...
         -(ceil(index_face/nf_init)-1)*nf_init;
-    SubDInfo(index_face).corner = corner(index_face,:);
+    SubDInfos(index_face).corner = corner(index_face,:);
 
-    [nodes,mmtxs,tree,turn] = CCS2DDevideMesh(subd,topo,clas,index_face);
-    SubDInfo(index_face).nodes = nodes;
-    SubDInfo(index_face).mmtxs = mmtxs;
-    SubDInfo(index_face).tree  = tree;
-    SubDInfo(index_face).turn  = turn;
+    [nodes,mmtxs,tree,turn,type] = CCS2DDevideMesh( ...
+        subd,topo,clas,index_face);
+    SubDInfos(index_face).nodes = nodes;
+    SubDInfos(index_face).mmtxs = mmtxs;
+    SubDInfos(index_face).tree  = tree;
+    SubDInfos(index_face).turn  = turn;
+    SubDInfos(index_face).type  = type;
 end
 
 end

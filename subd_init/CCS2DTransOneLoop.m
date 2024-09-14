@@ -9,7 +9,7 @@ function [trans,vtype,imtxs] = CCS2DTransOneLoop(vtype,ftype,N)
 % Email : jinlz0428@outlook.com
 %
 % Date Created : 2024/09/06
-% Last Modified: 2024/09/06
+% Last Modified: 2024/09/13
 %
 % =========================================================================
 % Calling Sequence:
@@ -22,6 +22,8 @@ function [trans,vtype,imtxs] = CCS2DTransOneLoop(vtype,ftype,N)
 %
 % Outputs:
 %    trans :
+%    vtype :
+%    imtxs :
 %
 %% Body of programs =======================================================
 %
@@ -111,7 +113,7 @@ switch ftype
         imtxs = cell(4,1);
         imtxs{1} = [01 26 13 31 18 25 02 33 03 23 04 22];
         imtxs{2} = [26 02 33 13 31 01 27 14 24 03 23 04];
-        imtxs{3} = [13 33 03 23 04 31 01 26 02 27 14 24 15 22 16 30];
+        imtxs{3} = [13 33 03 23 04 31 01 26 02 27 14 24 15 32 16 30];
         imtxs{4} = [31 13 23 04 22 18 25 01 26 02 33 03 32 16 30 17];
 
     case 202 % Boundary regular mesh-2
@@ -141,7 +143,43 @@ switch ftype
         imtxs{4} = [28 13 21 04 01 23 02 31 03 30 18 27];
 
     case 21 % Boundary irregular mesh with 1 boundary vertex
-        imtxs = [];
+        %! Number of vertices, faces, and edges
+        N1 = N(1);
+        N2 = N(2);
+        nv = 2*N1+2*N2+11;
+        nf = 1*N1+1*N2+06;
+        ne = 3*N1+3*N2+16;
+
+        %! Generate a new mesh topology
+        D = 2*N1+2*N2;
+        F = [
+            0001 D+04 0002 0003 0004 0005
+            0002 D+05 D+06 D+07 0003 0004
+            0003 D+06 D+07 D+08 D+09 D+10
+            0004 0002 0003 D+09 D+10 D+11
+            ];
+        F = [F(:,1),[4:2:2*N1+2;5:2:2*N1+3;6:2:2*N1+4;ones(1,N1)], ...
+            [2*N1+5:2:D+3;2*N1+6:2:D+4;2*N1+7:2:D+3,2;ones(1,N2)], ...
+            F(:,2:end)]';
+
+        E = [
+            D+11 D+10 D+09 0004 0003 0002 D+04, ...
+            D+11 D+10 D+09 0003 D+08 D+07 D+06
+            D+10 D+09 D+08 0003 D+07 D+06 D+05, ...
+            0005 0004 0003 0002 D+07 D+06 D+05
+            ];
+        E = [E,[ones(1,N1+1);4:2:2*N1+4],[ones(1,N2+1);2*N1+5:2:D+3,2], ...
+            [4:2*N1+3;5:2*N1+4],[2*N1+5:D+4;2*N1+6:D+4,2]]';
+
+        %!
+        Y = N1+N2; M = 2*Y+11; R = 3*Y+17;
+        imtm1 = reshape([R+15:R+N1+15;M+2:M+N1+1,0],1,[]);
+        imtm2 = reshape([R+N1+16:R+Y+15;M+N1+2:M+Y+1],1,[]);
+        imtxs = cell(4,1);
+        imtxs{1} = [01 R+Y+16 M+01 imtm1(1:end-1) imtm2 R+3*Y+16 02 R+11 03 R+04 04 R+Y+17];
+        imtxs{2} = [R+Y+16 02 R+11 M+01 R+15 01 R+Y+15 M+Y+01 R+3*Y+16 M+Y+02 R+06 M+Y+03 R+05 03 R+04 04];
+        imtxs{3} = [M+01 R+11 03 R+04 04 R+15 01 R+Y+16 02 R+06 M+Y+03 R+05 M+Y+04 R+10 M+Y+05 R+09];
+        imtxs{4} = [R+15 M+01 R+04 04 R+Y+17 M+02 R+16 01 R+Y+16 02 R+11 03 R+10 M+Y+05 R+09 M+Y+06];
 
     case 221 % Boundary irregular mesh with 2 boundary vertices
         %! Number of vertices, faces, and edges
@@ -172,7 +210,7 @@ switch ftype
         imtmp = reshape([M+6:R;R+15:K+12,0],1,[]);
         imtxs = cell(4,1);
         imtxs{1} = [0001 R+06 M+01 R+14 imtmp(1:end-1) K+13 0002 R+11 0003 R+04 0004 K+14];
-        imtxs{2} = [R+06 0002 R+11 M+01 R+14 0001 R+07 M+02 R+05 0003 R+04 0004 R+14 0001];
+        imtxs{2} = [R+06 0002 R+11 M+01 R+14 0001 R+07 M+02 R+05 0003 R+04 0004];
         imtxs{3} = [M+01 R+11 0003 R+04 0004 R+14 0001 R+06 0002 R+07 M+02 R+05 M+03 R+10 M+04 R+09];
         imtxs{4} = [R+14 M+01 R+04 0004 K+14 M+06 R+15 0001 R+06 0002 R+11 0003 R+10 M+04 R+09 M+05];
 
@@ -206,7 +244,7 @@ switch ftype
         imtxs = cell(4,1);
         imtxs{1} = [0001 K+13 M+01 R+08 imtmp(1:end-1) 0002 R+10 0003 R+03 0004];
         imtxs{2} = [K+13 0002 R+10 M+01 R+08 0001 K+12 P+00 R+3*N+11  R-03 R+05 R-02 R+04 0003 R+03 0004];
-        imtxs{3} = [M+01 R+10 0003 R+03 0004 R+08 0001 K+12 0002 R+05 P+02 R+04 P+03 R+09 P+04 R+07];
+        imtxs{3} = [M+01 R+10 0003 R+03 0004 R+08 0001 K+13 0002 R+05 P+02 R+04 P+03 R+09 P+04 R+07];
         imtxs{4} = [R+08 M+01 R+03 0004 0001 K+13 0002 R+10 0003 R+09 P+04 R+07];
 
     case 23 % Boundary irregular mesh with 3 boundary vertices
@@ -237,7 +275,7 @@ switch ftype
         imtxs{4} = [R+08 M+01 R+03 0004 0001 R+05 0002 R+10 0003 R+09 M+04 R+07];
 
     otherwise
-        error(' ');
+        error('Sorry, an error has occurred.');
 end
 
 %%

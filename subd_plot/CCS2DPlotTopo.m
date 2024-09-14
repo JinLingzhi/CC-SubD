@@ -9,7 +9,7 @@ function CCS2DPlotTopo(subd,level,varargin)
 % Email : jinlz0428@outlook.com
 %
 % Date Created : 2024/09/05
-% Last Modified: 2024/09/06
+% Last Modified: 2024/09/14
 %
 % =========================================================================
 % Calling Sequence:
@@ -38,7 +38,12 @@ linewidth = 1.0;                                                           % 线
 facecolor = [241,244,250]/255;                                             % 面颜色
 coloralph = 1.0;                                                           % 颜色透明度
 
-colorlist = [];
+colorlist = [
+    000 000 000
+    255 000 000
+    000 000 255
+    000 255 000
+    ]/255;
 
 %% Recover Param/Value pairs from argument list
 for index_param = 1:2:nargs-m
@@ -90,10 +95,12 @@ for index_param = 1:2:nargs-m
 end
 
 %%
-subd = CCS2DGlobalRefine(subd,level);
-V = subd.vertex; 
+if level > 0
+    subd = CCS2DGlobalRefine(subd,level);
+end
+V = subd.vertex;
 T = subd.vtype;
-F = subd.face; 
+F = subd.face;
 E = subd.edge;
 Eic = subd.eic;
 
@@ -118,21 +125,21 @@ end
 
 %% Plot all vertex, face, and edge points
 subd2 = subd; subd2.vtype(:) = 3;
-subd2 = CCS2DGlobalRefine(subd2,1);
+subd2 = CCS2DGlobalRefineOne(subd2);
 
 vv  = subd2.vertex(1:nv,:);
 txt = cellfun(@num2str,num2cell(1:nv),'UniformOutput',false);
-text(vv(:,1),vv(:,2),vv(:,3),txt,'Color','k','FontSize',14);
+text(vv(:,1),vv(:,2),vv(:,3),txt,'Color',colorlist(1,:),'FontSize',14);
 hold on
 
 vf  = subd2.vertex(nv+(1:nf),:);
 txt = cellfun(@num2str,num2cell(nv+(1:nf)),'UniformOutput',false);
-text(vf(:,1),vf(:,2),vf(:,3),txt,'Color','b','FontSize',14);
+text(vf(:,1),vf(:,2),vf(:,3),txt,'Color',colorlist(2,:),'FontSize',14);
 hold on
 
 ve  = subd2.vertex(nv+nf+(1:ne),:);
 txt = cellfun(@num2str,num2cell(nv+nf+(1:ne)),'UniformOutput',false);
-text(ve(:,1),ve(:,2),ve(:,3),txt,'Color','r','FontSize',14);
+text(ve(:,1),ve(:,2),ve(:,3),txt,'Color',colorlist(3,:),'FontSize',14);
 hold on
 
 %% Figure properties setting

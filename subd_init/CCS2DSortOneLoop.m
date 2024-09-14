@@ -63,14 +63,55 @@ if fcls == 22
         crfn = 1;
     end
 
+elseif fcls == 21
+    ftype = 21;
+    invi = find(vcls < 0,1);
+    turn = invi-1;
+
+    vseq = subd.face(fidx,k(invi));
+    fseq = [];
+
+    nxfi = fidx;
+    nxvi = invi;
+    crfn = 0;
+
+    while 1
+
+        while isempty(find(vseq == subd.face(nxfi,k(nxvi+1)),1))
+            nxvi = k(nxvi+1);
+            vseq(end+1) = subd.face(nxfi,k(nxvi)); %#ok<*AGROW>
+        end
+        fseq(end+1) = nxfi;
+
+        crvi = nxvi;
+        crfi = nxfi;
+
+        next = topo.eftop{subd.eic((k(crvi)-1)*nf+crfi)};
+        if length(next) == 1
+            break;
+        end
+
+        nxfi = setdiff(next,crfi);
+        nxvi = find(subd.face(nxfi,:) == subd.face(crfi,k(crvi)));
+        crfn = crfn+1;
+
+    end
+
+    nbre = topo.vetop{subd.face(fidx,k(invi))};
+    temp = find(clas.eclas(nbre) == 2,2);
+    nxei = setdiff(nbre(temp),subd.eic((k(crvi)-1)*nf+crfi));
+    nxfi = topo.eftop{nxei}(1);
+    nxvi = find(subd.face(nxfi,:) == subd.face(fidx,k(invi)),1);
+
+    N = [crfn,N-crfn-1];
+    crfn = crfn+1;
+
 else
     switch fcls
         case 10
             invi = 1;
         case 11
             invi = find(vcls >   0,1);
-        case 21
-            invi = find(vcls <   0,1);
         case 23
             invi = find(vcls == -1,1);
         otherwise
@@ -88,11 +129,11 @@ else
 end
 
 %%
-while crfn <= length(nbrf)
+while crfn < length(nbrf)+1
 
     while isempty(find(vseq == subd.face(nxfi,k(nxvi+1)),1))
         nxvi = k(nxvi+1);
-        vseq(end+1) = subd.face(nxfi,k(nxvi)); %#ok<*AGROW>
+        vseq(end+1) = subd.face(nxfi,k(nxvi));
     end
     fseq(end+1) = nxfi;
 
