@@ -79,10 +79,11 @@ end
 # 版本说明
 v1.0.0版本只提供matlab版本的相关程序，并存放于matlab分支下。该版本已基本实现了细分曲面基函数计算的核心功能，但目前仅有部分代码附带了注释，后续版本将进一步完善。
 
-The v1.0.0 version only provides relevant programs in the MATLAB version, which are stored under the MATLAB branch. This version has implemented most of the core functions for basis function calculations, but currently, only some of the code includes comments. Future versions will further improve this.
+v1.0.0 version only provides relevant programs in the MATLAB version, which are stored under the MATLAB branch. This version has implemented most of the core functions for basis function calculations, but currently, only some of the code includes comments. Future versions will further improve this.
 
 # 更新日志
 v1.0.0 
+
 实现了不同类型的边界网格、含一个奇异点内部非规则网格以及内部规则网格相应极限曲面的基函数计算。
 
-v1.0.0 implemented the basis function calculations for different types of boundary grids, internal irregular mesh with a singularity, and the corresponding limit surfaces of internal regular grids.
+implemented the basis function calculations for different types of boundary grids, internal irregular mesh with a singularity, and the corresponding limit surfaces of internal regular grids.
